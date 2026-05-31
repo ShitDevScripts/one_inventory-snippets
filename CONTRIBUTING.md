@@ -22,3 +22,15 @@ Thank you for your interest in contributing to OneInventory Snippets!
 If you find a bug or have a suggestion, please open an issue and provide as much detail as possible.
 
 We appreciate all contributions that help improve this repository.
+
+
+
+
+
+
+## Contributors
+
+Thanks goes to these wonderful people:
+
+<!-- ALL-CONTRIBUTORS-LIST:START -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
