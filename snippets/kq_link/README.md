@@ -16,3 +16,8 @@ To use **one_inventory** with **kq_link**, follow these steps:
 3. Save the file and restart the resource.
 
 **kq_link** will now use **one_inventory** as its inventory system.
+
+
+
+
+script by **kuzquality**: https://kuzquality.com/

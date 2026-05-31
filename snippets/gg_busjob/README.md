@@ -25,3 +25,6 @@ To use **one_inventory** with **GG-BUSJOB**, follow these steps:
 5. Save the file and restart the resource.
 
 **GG-BUSJOB** will now use **one_inventory** as its inventory system.
+
+
+script by **ggstudio**: https://www.ggstudio.store/
