@@ -13,7 +13,7 @@ Developed by **OneStudios**: https://onestudios.gg
 See the repository license for details.
 
 
-⚠️ Disclaimer
+## ⚠️ Disclaimer
 
 I cannot test everything in all environments, so issues may occur depending on setup, versions, or integrations.
 
