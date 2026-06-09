@@ -1,6 +1,6 @@
 # OneInventory Snippets
 
-A collection of snippets and examples for **OneInventory**.
+A collection of snippets and examples for **One_Inventory**.
 
 ## About
 
@@ -12,6 +12,15 @@ Developed by **OneStudios**: https://onestudios.gg
 
 See the repository license for details.
 
+cdev_lib (need testing)🔴
+devhub_lib (need testing)🔴
+gg_busjob (tested and working)🟢
+kq_link (tested and working)🟢
+lation_shops (tested and working)🟢
+lb-phone (tested and working)🟢
+nass_lib (need testing)🔴
+wasabi_bridge(need testing)🔴
+jim-bridge (tested and working)🟢
 
 ## ⚠️ Disclaimer
 
