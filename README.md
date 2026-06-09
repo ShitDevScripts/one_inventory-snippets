@@ -12,15 +12,19 @@ Developed by **OneStudios**: https://onestudios.gg
 
 See the repository license for details.
 
-cdev_lib (need testing)🔴
-devhub_lib (need testing)🔴
-gg_busjob (tested and working)🟢
-kq_link (tested and working)🟢
-lation_shops (tested and working)🟢
-lb-phone (tested and working)🟢
-nass_lib (need testing)🔴
-wasabi_bridge(need testing)🔴
-jim-bridge (tested and working)🟢
+## Supported Resources
+
+| Resource | Status |
+|-----------|----------|
+| `cdev_lib` | 🔴 Needs Testing |
+| `devhub_lib` | 🔴 Needs Testing |
+| `gg_busjob` | 🟢 Tested & Working |
+| `kq_link` | 🟢 Tested & Working |
+| `lation_shops` | 🟢 Tested & Working |
+| `lb-phone` | 🟢 Tested & Working |
+| `nass_lib` | 🔴 Needs Testing |
+| `wasabi_bridge` | 🔴 Needs Testing |
+| `jim-bridge` | 🟢 Tested & Working |
 
 ## ⚠️ Disclaimer
 
