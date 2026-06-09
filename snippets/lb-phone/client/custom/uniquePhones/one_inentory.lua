@@ -3,9 +3,11 @@ if Config.Item.Inventory ~= "one_inventory" or not Config.Item.Unique or not Con
 end
 
 SetTimeout(1000, function()
-    exports.one_inventory:ShowItemMetadata("lbPhoneNumber", "Phone number")
-    exports.one_inventory:ShowItemMetadata("lbFormattedNumber", "Formatted number")
-    exports.one_inventory:ShowItemMetadata("lbPhoneName", "Phone name")
+    exports.one_inventory:ShowItemMetadata({
+        lbPhoneNumber = "Phone number",
+        lbFormattedNumber = "Formatted number",
+        lbPhoneName = "Phone name",
+    })
 end)
 
 ---@return table
@@ -81,15 +83,13 @@ local function OnUseItem(itemName, slotId, metadata)
     end
 end
 
----@param itemName string
----@param slotId number
----@param metadata? table
-AddEventHandler("one_inventory:usedItem", function(itemName, slotId, metadata)
-    if not IsItemAPhone(itemName) then
+---@param payload table
+RegisterNetEvent("one_inventory:onItemUsed", function(payload)
+    if not IsItemAPhone(payload.item) then
         return
     end
 
-    OnUseItem(itemName, slotId, metadata)
+    OnUseItem(payload.item, payload.slot, payload.metadata)
 end)
 
 ---@param item { name: string, slot: number, metadata?: table }
@@ -97,10 +97,9 @@ exports("UsePhoneItem", function(_, item)
     OnUseItem(item.name, item.slot, item.metadata)
 end)
 
----@param itemName string
----@param count number
-AddEventHandler("one_inventory:itemCount", function(itemName, count)
-    if not IsItemAPhone(itemName) then
+---@param payload table
+RegisterNetEvent("one_inventory:onItemCountChange", function(payload)
+    if not IsItemAPhone(payload.item) then
         return
     end
 
@@ -110,7 +109,7 @@ AddEventHandler("one_inventory:itemCount", function(itemName, count)
         if not HasPhoneItem(currentPhone) then
             SetPhone()
         end
-    elseif count > 0 then
+    elseif payload.newCount > 0 then
         local firstNumber = GetFirstNumber()
 
         SetPhone(firstNumber, true)

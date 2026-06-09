@@ -2,6 +2,25 @@ if Config.Item.Inventory ~= "one_inventory" or not Config.Item.Unique or not Con
     return
 end
 
+---Format phone number for display
+---@param number string
+---@return string|nil
+local function FormatNumber(number)
+    if not number then
+        return nil
+    end
+
+    local numStr = tostring(number)
+
+    if #numStr == 7 then
+        return string.sub(numStr, 1, 3) .. "-" .. string.sub(numStr, 4, 7)
+    elseif #numStr == 10 then
+        return string.sub(numStr, 1, 3) .. "-" .. string.sub(numStr, 4, 6) .. "-" .. string.sub(numStr, 7, 10)
+    end
+
+    return number
+end
+
 ---@param source number
 ---@return table
 local function GetPhonesInInventory(source)
@@ -15,7 +34,7 @@ local function GetPhonesInInventory(source)
         local items = exports.one_inventory:SearchInventory(source, Config.Item.Names[i].name) or {}
 
         for _, phone in pairs(items) do
-            phones[#phones+1] = phone
+            phones[#phones + 1] = phone
         end
     end
 
@@ -47,20 +66,17 @@ end
 ---@type { [number]: number }
 local usedPhoneSlots = {}
 
----@param source number
----@param itemName string
----@param slotId number
----@param metadata? table
-AddEventHandler("one_inventory:usedItem", function(source, itemName, slotId, metadata)
-    if not IsItemAPhone(itemName) then
+---@param payload table
+RegisterNetEvent("one_inventory:onItemUsed", function(payload)
+    if not IsItemAPhone(payload.item) then
         return
     end
 
-    usedPhoneSlots[source] = slotId
+    usedPhoneSlots[payload.source] = payload.slot
 
     SetTimeout(10000, function()
-        if usedPhoneSlots[source] == slotId then
-            usedPhoneSlots[source] = nil
+        if usedPhoneSlots[payload.source] == payload.slot then
+            usedPhoneSlots[payload.source] = nil
         end
     end)
 end)
@@ -82,7 +98,8 @@ function SetPhoneNumber(source, phoneNumber)
         if phone and phone.metadata?.lbPhoneNumber == nil then
             phone.metadata = {
                 lbPhoneNumber = phoneNumber,
-                lbFormattedNumber = FormatNumber(phoneNumber)
+                lbFormattedNumber = FormatNumber(phoneNumber),
+                lbPhoneName = phone.metadata?.lbPhoneName or nil,
             }
 
             exports.one_inventory:SetItemMetadata(source, phone.slot, phone.metadata)
@@ -100,7 +117,8 @@ function SetPhoneNumber(source, phoneNumber)
         if phone and phone.metadata?.lbPhoneNumber == nil then
             phone.metadata = {
                 lbPhoneNumber = phoneNumber,
-                lbFormattedNumber = FormatNumber(phoneNumber)
+                lbFormattedNumber = FormatNumber(phoneNumber),
+                lbPhoneName = phone.metadata?.lbPhoneName or nil,
             }
 
             exports.one_inventory:SetItemMetadata(source, phone.slot, phone.metadata)
@@ -117,7 +135,19 @@ end
 ---@param phoneNumber string
 ---@param name string
 function SetItemName(source, phoneNumber, name)
-    local phones = exports.one_inventory:SearchInventory(source, Config.Item.Name)
+    local phones = {}
+
+    if Config.Item.Name then
+        phones = exports.one_inventory:SearchInventory(source, Config.Item.Name) or {}
+    else
+        for i = 1, #Config.Item.Names do
+            local items = exports.one_inventory:SearchInventory(source, Config.Item.Names[i].name) or {}
+
+            for _, phone in pairs(items) do
+                phones[#phones + 1] = phone
+            end
+        end
+    end
 
     if not phones then
         return false
