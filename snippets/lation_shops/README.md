@@ -1,11 +1,11 @@
-To use **one_inventory** with **lation_shops**, follow these steps:
+To use **one_inventory** with **kq_link**, follow these steps:
 
-1. Navigate to the following directory: `lation_shops\bridge`
+1. Navigate to the following directory: `kq_link\links\inventories`
 
-2. Replace the **bridge** server and client files with the new ones.
+2. Place the **one_inventory** bridge file/folder inside the `inventories` directory.
 
 3. Save the file and restart the resource.
 
-**lation_shops** will now use **one_inventory** as its inventory system.
+**kq_link** will now use **one_inventory** as its inventory system.
 
-script by **lationscripts**: https://lationscripts.com/
+script by **kuzquality**: https://kuzquality.com/

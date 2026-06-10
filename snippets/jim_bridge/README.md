@@ -1,34 +1,13 @@
-### Inventory Setup
-
 To use **one_inventory** with **jim_bridge**, follow these steps:
 
-1. Navigate to the following directory:
+1. In **starter.lua** add this to the Exports: `OneInv = "one_inventory"`
 
-   ```
-   jim_bridge
-   ```
+2. Replace **frameworkCache.lua** with the new one we provide here.
 
-2. in the starter.lua add this to the Exports **OneInv = "one_inventory",**
+3. Navigate to `jim_bridge-main\shared` and replace **coreloader.lua** and **itemcontrol.lua** with the new files we provide here.
 
-3. Navigate to the following directory:
-
-   ```
-   jim_bridge
-   ```
-
-4. replce the **frameworkCache.lua** with the new one we provide here
-
-3. Navigate to the following directory:
-
-   ```
-   jim_bridge-main\shared
-   ```
-
-4. replce the **coreloader.lua** and the **itemcontrol.lua** with the new files we provide here
+4. Save the file and restart the resource.
 
 **jim_bridge** will now use **one_inventory** as its inventory system.
-
-
-
 
 script by **jim**: https://jimathy666.tebex.io/
