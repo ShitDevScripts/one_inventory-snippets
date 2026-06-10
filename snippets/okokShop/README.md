@@ -11,5 +11,3 @@ To use **one_inventory** with **okokShop**, follow these steps:
 **okokShop** will now use **one_inventory** as its inventory system.
 
 script by **okokscripts**: https://okok.tebex.io/
-
-^^ above been tested with qbox everything else should still work as intended for other users but this was for a qbox base and worked fine
