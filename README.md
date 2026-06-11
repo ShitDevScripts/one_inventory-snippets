@@ -14,11 +14,11 @@ See the repository license for details.
 
 ## Supported Resources
 
-| Resource | Status | Version
-|----------|--------|--------|
+| Resource | Status | Version | tebex done
+|----------|--------|--------|--------|
 | `cdev_lib` | 🔴 Needs Testing |
 | `devhub_lib` | 🔴 Needs Testing |
-| `gg_busjob` | 🟢 Tested & Working |
+| `gg_busjob` | 🟢 Tested & Working | | yes
 | `jim-bridge` | 🟢 Tested & Working | 2.1.09
 | `kq_link` | 🟢 Tested & Working |
 | `lation_shops` | 🟢 Tested & Working |
