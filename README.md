@@ -14,8 +14,8 @@ See the repository license for details.
 
 ## Supported Resources
 
-| Resource | Status |
-|----------|--------|
+| Resource | Status | Version
+|----------|--------|--------|
 | `cdev_lib` | 🔴 Needs Testing |
 | `devhub_lib` | 🔴 Needs Testing |
 | `gg_busjob` | 🟢 Tested & Working |
@@ -28,7 +28,7 @@ See the repository license for details.
 | `wasabi_bridge` | 🔴 Needs Testing |
 | `vms_bossmenu` | 🟢 Tested & Working |
 | `okokshop` | 🟢 Tested & Working |
-| `kartik_mdtV2` | 🟢 Tested & Working | `beta v2.0.4`
+| `kartik_mdtV2` | 🟢 Tested & Working | beta v2.0.4
 
 ## ⚠️ Disclaimer
 
