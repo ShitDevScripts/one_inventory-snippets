@@ -28,6 +28,7 @@ See the repository license for details.
 | `wasabi_bridge` | 🔴 Needs Testing |
 | `vms_bossmenu` | 🟢 Tested & Working |
 | `okokshop` | 🟢 Tested & Working |
+| `kartik_mdtV2` | 🟢 Tested & Working | beta v2.0.4
 
 ## ⚠️ Disclaimer
 
