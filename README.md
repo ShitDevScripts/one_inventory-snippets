@@ -31,6 +31,7 @@ See the repository license for details.
 | `kartik_mdtV2` | 🟢 Tested & Working | beta v2.0.4
 | `17mov_Phone` | 🟢 Tested & Working | 1.2.3
 | `luxu_admin` | 🟢 Tested & Working (trunk/glovebox not working) | 1.14.6
+| `rcore_prison` | 🔴 Needs More Testing only works for auto-detect?? | 2.3.0
 
 ## ⚠️ Disclaimer
 
