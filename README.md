@@ -32,6 +32,8 @@ See the repository license for details.
 | `17mov_Phone` | 🟢 Tested & Working | 1.2.3
 | `luxu_admin` | 🟢 Tested & Working (trunk/glovebox not working) | 1.14.6
 | `tk_policejob` | 🟢 Tested & Working | 1.4.4
+| `p_bridge` | 🟢 Tested & Working | 1.2.9
+
 
 ## ⚠️ Disclaimer
 
