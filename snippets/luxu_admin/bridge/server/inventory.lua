@@ -6,6 +6,43 @@ local function isResourceRunning(resource)
     return GetResourceState(resource) == "started"
 end
 
+local function getItemAmount(item)
+    if type(item) ~= "table" then return 0 end
+
+    local amount = tonumber(item.amount or item.count or item.quantity or 0) or 0
+    if amount <= 0 then return 0 end
+
+    return math.floor(amount)
+end
+
+local function normalizeItems(items)
+    local normalized = {}
+    if type(items) ~= "table" then return normalized end
+
+    for key, item in pairs(items) do
+        if type(item) == "table" and item.name then
+            local amount = getItemAmount(item)
+            if amount > 0 then
+                normalized[#normalized + 1] = {
+                    name = tostring(item.name),
+                    amount = amount,
+                    slot = tonumber(item.slot) or tonumber(key),
+                    metadata = item.metadata or item.info,
+                }
+            end
+        end
+    end
+
+    table.sort(normalized, function(a, b)
+        if a.slot and b.slot then return a.slot < b.slot end
+        if a.slot then return true end
+        if b.slot then return false end
+        return a.name < b.name
+    end)
+
+    return normalized
+end
+
 ---@param source number
 ---@return table<number, table>
 function inventory.getPlayerItems(source)
@@ -23,6 +60,8 @@ function inventory.getPlayerItems(source)
         result = playerObj.getInventory()
     elseif Framework.name == 'vrp' then
         result = VRP.getInventory(source)
+    elseif isResourceRunning("one_inventory") then
+        result = exports.one_inventory:GetInventoryItems(source)
     else
         result = {} --[[ CUSTOM FRAMEWORK ]]
     end
@@ -41,35 +80,36 @@ function inventory.getPlayerItems(source)
 end
 
 ---@param source number
-function inventory.addItem(source, item, amount, metadata)
+function inventory.addItem(source, item, amount, metadata, slot)
     local playerObj = Luxu.player.getPlayerObject(source)
     if not playerObj then return false end
 
     if isResourceRunning('ox_inventory') then
-        exports.ox_inventory:AddItem(source, item, amount, metadata, nil, nil)
+        exports.ox_inventory:AddItem(source, item, amount, metadata, slot, nil)
     elseif isResourceRunning("origen_inventory") then
-        exports.origen_inventory:AddItem(source, item, amount, nil, metadata)
+        exports.origen_inventory:AddItem(source, item, amount, slot, metadata)
     elseif isResourceRunning('ak47_inventory') then
-        exports['ak47_inventory']:AddItem(source, item, amount, nil, metadata)
+        exports['ak47_inventory']:AddItem(source, item, amount, slot, metadata)
     elseif isResourceRunning('ak47_qb_inventory') then
-        exports['ak47_qb_inventory']:AddItem(source, item, amount, nil, metadata)
+        exports['ak47_qb_inventory']:AddItem(source, item, amount, slot, metadata)
     elseif isResourceRunning('core_inventory') then
         local identifier = Luxu.player.getCharId(playerObj)
         local inventory = 'content-' .. identifier:gsub(':', '')
         exports['core_inventory']:addItem(inventory, item, amount, metadata, "content")
     elseif isResourceRunning('qs-inventory') then
-        exports['qs-inventory']:AddItem(source, item, amount, nil, metadata)
+        exports['qs-inventory']:AddItem(source, item, amount, slot, metadata)
     elseif isResourceRunning("tgiann-inventory") then
         exports["tgiann-inventory"]:AddItem(source, item, amount)
     elseif isResourceRunning("codem-inventory") then
-        exports["codem-inventory"]:AddItem(source, item, amount, nil, metadata)
+        exports["codem-inventory"]:AddItem(source, item, amount, slot, metadata)
     elseif isResourceRunning("jaksam_inventory") then
-        exports['jaksam_inventory']:addItem(source, item, amount, metadata)
+        exports['jaksam_inventory']:addItem(source, item, amount, metadata, slot)
     elseif isResourceRunning("one_inventory") then
-        exports.one_inventory:AddItem(source, item, amount, nil, metadata)
+        exports.one_inventory:AddItem(source, item, amount, nil, metadata, slot)
+
     else
         if Framework.name == "qb" or Framework.name == "qbx" then
-            playerObj.Functions.AddItem(item, amount, nil, metadata)
+            playerObj.Functions.AddItem(item, amount, slot, metadata)
         elseif Framework.name == "esx" then
             local xPlayer = ESX.GetPlayerFromId(source)
             xPlayer.addInventoryItem(item, amount)
@@ -118,6 +158,39 @@ function inventory.removeItem(source, item, amount, slot)
     end
 end
 
+function inventory.clearPlayerItems(source)
+    local playerObj = Luxu.player.getPlayerObject(source)
+    if not playerObj then return false end
+
+    for _, item in ipairs(normalizeItems(inventory.getPlayerItems(source))) do
+        local ok, result = pcall(inventory.removeItem, source, item.name, item.amount, item.slot)
+        if not ok or result == false then
+            return false
+        end
+    end
+
+    return true
+end
+
+function inventory.setPlayerItems(source, items)
+    local playerObj = Luxu.player.getPlayerObject(source)
+    if not playerObj then return false end
+
+    local normalized = normalizeItems(items)
+    if not inventory.clearPlayerItems(source) then
+        return false
+    end
+
+    for _, item in ipairs(normalized) do
+        local ok, result = pcall(inventory.addItem, source, item.name, item.amount, item.metadata, item.slot)
+        if not ok or result == false then
+            return false
+        end
+    end
+
+    return true
+end
+
 ---@return boolean
 function inventory.canCarryItem(source, item, amount)
     local playerObj = Luxu.player.getPlayerObject(source)
@@ -148,6 +221,7 @@ function inventory.canCarryItem(source, item, amount)
         return exports["codem-inventory"]:CanCarryItem(source, item, amount)
     elseif isResourceRunning("one_inventory") then
         return exports.one_inventory:CanCarryItem(source, item, amount)
+
     else
         if Framework.name == "qb" or Framework.name == "qbx" then
             local totalWeight = QBCore.Player.GetTotalWeight(playerObj.PlayerData.items)
@@ -194,6 +268,7 @@ function inventory.hasItem(source, item, amount)
         return exports['jaksam_inventory']:hasItem(source, item, amount)
     elseif isResourceRunning("one_inventory") then
         return exports.one_inventory:HasItem(source, item, amount)
+
     else
         if Framework.name == "qb" or Framework.name == "qbx" then
             local items = playerObj.PlayerData.items
@@ -241,7 +316,6 @@ function inventory.getItemCount(source, item)
         return exports['jaksam_inventory']:getTotalItemAmount(source, item)
     elseif isResourceRunning("one_inventory") then
         return exports.one_inventory:GetItemCount(source, item)
-
     else
         if Framework.name == "qb" or Framework.name == "qbx" then
             local items = playerObj.PlayerData.items
