@@ -133,6 +133,26 @@ local itemFunc = {
             end
         end,
     },
+    {   script = Exports.OneInv,
+        cacheItem = function()
+            local success, result = pcall(function()
+                return exports[Exports.OneInv]:GetItemDefinitions()
+            end)
+            if success and result and next(result) then
+                cache.Items = result
+            else
+                while not (cache.Items and next(cache.Items)) do
+                    Wait(1000)
+                    success, result = pcall(function()
+                        return exports[Exports.OneInv]:v()
+                    end)
+                    if success and result and next(result) then
+                        cache.Items = result
+                    end
+                end
+            end
+        end,
+    },
     {   script = Exports.TgiannInv,
         cacheItem = function()
             local success, result = pcall(function()
@@ -164,7 +184,10 @@ local itemFunc = {
 
                 elseif GetResourceState(Exports.TgiannInv):find("start") then
                     itemResource = Exports.TgiannInv
-                    cache.Items = exports[Exports.TgiannInv]:Items()
+                    cache.Items = exports[Exports.OneInv]:Items()
+                elseif GetResourceState(Exports.OneInv):find("start") then
+                    itemResource = Exports.OneInv
+                    cache.Items = exports[Exports.OneInv]:GetItemDefinition()
                 end
             end
         end,
@@ -205,26 +228,6 @@ local itemFunc = {
                 }
             end
             cache.Items = tempItems
-        end,
-    },
-    {   script = Exports.OneInv,
-        cacheItem = function()
-            local success, result = pcall(function()
-                return exports[Exports.OneInv]:GetAllItemDefinitions()
-            end)
-            if success and result and next(result) then
-                cache.Items = result
-            else
-                while not (cache.Items and next(cache.Items)) do
-                    Wait(1000)
-                    success, result = pcall(function()
-                        return exports[Exports.OneInv]:GetAllItemDefinitions()
-                    end)
-                    if success and result and next(result) then
-                        cache.Items = result
-                    end
-                end
-            end
         end,
     },
 }
