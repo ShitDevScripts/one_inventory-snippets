@@ -1,5 +1,5 @@
 Switching to one_inventory with p_bridge
-To use one_inventory as your inventory system with jim_bridge, follow these steps:
+To use one_inventory as your inventory system with p_bridge, follow these steps:
 
 Remove the old p_bridge – Delete the existing p_bridge folder from your resources directory.
 
