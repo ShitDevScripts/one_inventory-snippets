@@ -56,6 +56,16 @@ function RegisterShops()
                         slots = #shop.items,
                         items = shop.items
                     })
+                elseif Config.Inventory == 'one' then
+                    exports.one_inventory:RegisterShop({
+                        name = 'tk_ambulancejob_shop_' .. stationId .. '_' .. shopId,
+                        label = _U('shop'),
+                        inventory = shop.items,
+                        locations = {
+                            shop.coords
+                        },
+                        slots = #shop.items,
+                    })
                 end
             end
         end
