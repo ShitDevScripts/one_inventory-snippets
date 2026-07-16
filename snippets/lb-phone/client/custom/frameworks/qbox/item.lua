@@ -1,0 +1,22 @@
+if Config.Framework ~= "qbox" then
+    return
+end
+
+while not QB do
+    Wait(500)
+    debugprint("Item: Waiting for QBox to load")
+end
+
+---@param itemName string
+---@return boolean
+function HasItem(itemName)
+    if GetResourceState("ox_inventory") == "started" then
+        return (exports.ox_inventory:Search("count", itemName) or 0) > 0
+    end
+
+    if GetResourceState("one_inventory") == "started" then
+        return exports.one_inventory:HasItem(itemName)
+    end
+
+    return QB.Functions.HasItem(itemName)
+end
