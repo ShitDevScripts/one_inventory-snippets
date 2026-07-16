@@ -424,6 +424,33 @@ function inventory.getStash(typeofStash, id)
         end
     elseif isResourceRunning("core_inventory") then
         return exports.core_inventory:getInventory("stash-" .. id)
+    elseif isResourceRunning("one_inventory") then
+        local invIdentifier
+        if typeofStash == "stash" then
+            invIdentifier = "stash:" .. id
+        elseif typeofStash == "trunk" then
+            invIdentifier = "trunk:" .. id
+        elseif typeofStash == "glovebox" then
+            invIdentifier = "glovebox:" .. id
+        else
+            return {}
+        end
+
+        local inventoryData = exports.one_inventory:GetInventory(invIdentifier)
+        if not inventoryData or not inventoryData.slots then
+            return {}
+        end
+
+        local items = {}
+        for _, slot in ipairs(inventoryData.slots) do
+            table.insert(items, {
+                name = slot.name,
+                count = slot.count,
+                metadata = slot.metadata or {},
+                slot = slot.slot
+            })
+        end
+        return items
     end
     return {}
 end
