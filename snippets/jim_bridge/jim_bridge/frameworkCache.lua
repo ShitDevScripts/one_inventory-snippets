@@ -39,7 +39,7 @@ local Exports = {
 }
 
 -- Prevent reloading if cache is already initialized
-local cache = { Items = {}, Vehicles = {}, Jobs = {}, Gangs = {}, }
+local cache = { Items = {}, Vehicles = {}, Jobs = {}, Gangs = {}, InventoryWeight = 30000, InventorySlots = 40 }
 local cacheReady = false
 
 -- Timer info, for debugging more then anything
@@ -86,6 +86,12 @@ local function dupLowercaseWeapons(items)
     end
 end
 
+local function tableCount(t)
+    local count = 0
+    for _ in pairs(t) do count = count + 1 end
+    return count
+end
+
 -- Forceload libs --
 
 -- Ensure oxmysql resource is loaded for jim_bridge internally
@@ -123,6 +129,25 @@ end
 ---------------------
 
 local itemFunc = {
+    {   script = Exports.OneInv,
+        cacheItem = function()
+            local timeout = GetGameTimer() + 30000
+            while GetGameTimer() < timeout do
+                local success, result = pcall(function()
+                    local items = exports[Exports.OneInv]:GetAllItemDefinitions()
+                    if not items or type(items) ~= "table" or not next(items) then
+                        return nil
+                    end
+                    return items
+                end)
+                if success and result and next(result) then
+                    cache.Items = result
+                    return
+                end
+                Wait(500)
+            end
+        end,
+    },
     {   script = Exports.OXInv,
         cacheItem = function()
             local success, result = pcall(function()
@@ -130,21 +155,6 @@ local itemFunc = {
             end)
             if success and result then
                 cache.Items = result
-            end
-        end,
-    },
-    {   script = Exports.OneInv,
-        cacheItem = function()
-            local timeout = GetGameTimer() + 30000
-            while GetGameTimer() < timeout do
-                local success, result = pcall(function()
-                    return exports[Exports.OneInv]:GetAllItemDefinitions()
-                end)
-                if success and result and next(result) then
-                    cache.Items = result
-                    return
-                end
-                Wait(100)
             end
         end,
     },
@@ -160,23 +170,19 @@ local itemFunc = {
     },
     {   script = Exports.QBXExport,
         cacheItem = function()
-            cache.Items = exports[Exports.QBExport]:GetCoreObject().Shared.Items
+            cache.Items = exports[Exports.QBXExport]:GetCoreObject().Shared.Items
             -- If this is nil, they need to update to qbx_core 1.23.0+
             if not cache.Items then
                 -- if their inventory doesn't allow that (they refuse to update their butchered core replacement):
-
                 if GetResourceState(Exports.OrigenInv):find("start") then
                     itemResource = Exports.OrigenInv
                     cache.Items = exports[Exports.OrigenInv]:Items()
-
                 elseif GetResourceState(Exports.CodeMInv):find("start") then
                     itemResource = Exports.CodeMInv
                     cache.Items = exports[Exports.CodeMInv]:GetItemList()
-
                 elseif GetResourceState(Exports.CoreInv):find("start") then
                     itemResource = Exports.CoreInv
                     cache.Items = exports[Exports.CoreInv]:getItemsList()
-
                 elseif GetResourceState(Exports.TgiannInv):find("start") then
                     itemResource = Exports.TgiannInv
                     cache.Items = exports[Exports.TgiannInv]:Items()
@@ -227,24 +233,34 @@ local itemFunc = {
 for i = 1, #itemFunc do
     local data = itemFunc[i]
     if checkExists(data.script) then
-        waitStarted(data.script)            -- Wait for detected script to start fully
-        data.cacheItem()                    -- run tablized function for core/inv
-        dupLowercaseWeapons(cache.Items)    -- make usable weapon item names for jim_bridge
-        itemResource = data.script          -- Grab script name to announce later
-        endTimer("Items")                   -- end timer
-        break                               -- break loop so it doesn't keep checking
+        waitStarted(data.script)
+        data.cacheItem()
+        
+        if cache.Items and next(cache.Items) then
+            dupLowercaseWeapons(cache.Items)
+            itemResource = data.script
+            endTimer("Items")
+            break
+        end
     end
+end
+
+-- Fallback if nil or empty
+if cache.Items == nil or not next(cache.Items) then
+    print("^1--------------------------------------------^7")
+    print("^1ERROR^7: ^1Can NOT find "..itemResource.." ^7Items ^1list^7, ^1possible error in that file or is it empty^7?")
+    print("^1--------------------------------------------^7")
+    cache.Items = {} -- Fallback to an empty table
 end
 
 ---------------------
 --- Load Vehicles ---
 ---------------------
----
-local vehicleFunc = {
 
+local vehicleFunc = {
     {   script = Exports.QBXExport,
         cacheVehicle = function()
-            cache.Vehicles = exports[Exports.QBExport]:GetCoreObject().Shared.Vehicles
+            cache.Vehicles = exports[Exports.QBXExport]:GetCoreObject().Shared.Vehicles
         end,
     },
     {   script = Exports.QBExport,
@@ -285,7 +301,7 @@ local vehicleFunc = {
     },
     {   script = Exports.VorpExport,
         cacheVehicle = function()
-            cache.Vehicles = { ["unkown"] = {} }
+            cache.Vehicles = { ["unknown"] = {} }
         end,
     },
 }
@@ -293,12 +309,20 @@ local vehicleFunc = {
 for i = 1, #vehicleFunc do
     local data = vehicleFunc[i]
     if checkExists(data.script) then
-        waitStarted(data.script)            -- Wait for detected script to start fully
-        data.cacheVehicle()                    -- run tablized function for core
-        vehResource = data.script          -- Grab script name to announce later
-        endTimer("Vehicles")                   -- end timer
-        break                               -- break loop so it doesn't keep checking
+        waitStarted(data.script)
+        data.cacheVehicle()
+        vehResource = data.script
+        endTimer("Vehicles")
+        break
     end
+end
+
+-- Fallback if nil or empty
+if cache.Vehicles == nil or not next(cache.Vehicles) then
+    print("^1--------------------------------------------^7")
+    print("^1ERROR^7: ^1Can NOT find "..vehResource.." ^7Vehicles ^1list^7, ^1possible error in that file or is it empty^7?")
+    print("^1--------------------------------------------^7")
+    cache.Vehicles = {} -- Fallback to an empty table
 end
 
 ---------------------
@@ -306,7 +330,6 @@ end
 ---------------------
 
 local jobFunc = {
-
     {   script = Exports.QBXExport,
         cacheJob = function()
             cache.Jobs, cache.Gangs = exports[Exports.QBXExport]:GetJobs(), exports[Exports.QBXExport]:GetGangs()
@@ -380,7 +403,7 @@ local jobFunc = {
     },
     {   script = Exports.VorpExport,
         cacheJob = function()
-            cache.Jobs = { ["unkown"] = {} }
+            cache.Jobs = { ["unknown"] = {} }
             cache.Gangs = cache.Jobs
         end,
     },
@@ -389,28 +412,15 @@ local jobFunc = {
 for i = 1, #jobFunc do
     local data = jobFunc[i]
     if checkExists(data.script) then
-        waitStarted(data.script)            -- Wait for detected script to start fully
-        data.cacheJob()                    -- run tablized function for core
-        jobResource = data.script          -- Grab script name to announce later
-        endTimer("Jobs")                   -- end timer
-        break                               -- break loop so it doesn't keep checking
+        waitStarted(data.script)
+        data.cacheJob()
+        jobResource = data.script
+        endTimer("Jobs")
+        break
     end
 end
 
-
 -- Fallback if nil or empty
-if cache.Items == nil or not next(cache.Items) then
-    print("^1--------------------------------------------^7")
-    print("^1ERROR^7: ^1Can NOT find "..itemResource.." ^7Items ^1list^7, ^1possible error in that file or is it empty^7?")
-    print("^1--------------------------------------------^7")
-    cache.Items = {} -- Fallback to an empty table
-end
-if cache.Vehicles == nil or not next(cache.Vehicles) then
-    print("^1--------------------------------------------^7")
-    print("^1ERROR^7: ^1Can NOT find "..vehResource.." ^7Vehicles ^1list^7, ^1possible error in that file or is it empty^7?")
-    print("^1--------------------------------------------^7")
-    cache.Vehicles = {} -- Fallback to an empty table
-end
 if cache.Jobs == nil or not next(cache.Jobs) then
     print("^1--------------------------------------------^7")
     print("^1ERROR^7: ^1Can NOT find "..jobResource.." ^7job ^1list^7, ^1possible error in that file or is it empty^7?")
@@ -468,6 +478,10 @@ local invWeightTable = {
         weight = { key = "inventory:weight", default = 30000 },
         slots  = { key = "inventory:slots",  default = 40 }
     }},
+    [Exports.OneInv] = { convars = {
+        weight = { key = "one_inventory:maxWeight", default = 30000 },
+        slots  = { key = "one_inventory:maxSlots",  default = 40 }
+    }},
     [Exports.QBInv] = {
         fallback = {
             { file = "config.lua",              path = { "MaxInventoryWeight" }, slotPath = { "MaxInventorySlots" } }, -- old version
@@ -479,36 +493,23 @@ local invWeightTable = {
     [Exports.TgiannInv] =   { file = "configs/config.lua",      path = { "slotsMaxWeights", "player", "maxWeight" }, slotPath = { "slotsMaxWeights", "player", "slots" } },
     [Exports.CodeMInv] =    { file = "config/config.lua",       path = { "MaxWeight" }, slotPath = { "MaxSlots" } },
     [Exports.RSGInv] =      { file = "config/config.lua",       path = { "MaxWeight" }, slotPath = { "MaxSlots" } },
-    --[Exports.OrigenInv] = { file = "config.lua", path = { "MaxWeight" } },
 }
 
 -- Run config detection
 local invResource = ""
 
-local function loadOneInvConfig()
+if checkExists(Exports.OneInv) then
+    waitStartedOrStopped(Exports.OneInv)
     local ok, cfg = pcall(function()
         return exports[Exports.OneInv]:GetClientConfig()
     end)
-    if not ok or type(cfg) ~= "table" then return end
-
-    local weight = cfg.maxWeight
-        or (type(cfg.player) == "table" and cfg.player.maxWeight)
-        or (type(cfg.inventory) == "table" and cfg.inventory.maxWeight)
-        or (type(cfg.gameplay) == "table" and cfg.gameplay.maxWeight)
-
-    local slots = cfg.slots
-        or (type(cfg.player) == "table" and cfg.player.slots)
-        or (type(cfg.inventory) == "table" and cfg.inventory.slots)
-        or (type(cfg.gameplay) == "table" and cfg.gameplay.maxSlots)
-
-    if weight then cache.InventoryWeight = weight end
-    if slots then cache.InventorySlots = slots end
-end
-
-if checkExists(Exports.OneInv) then
-    waitStartedOrStopped(Exports.OneInv)
-    loadOneInvConfig()
-    invResource = Exports.OneInv:gsub("-", "^7-^4"):gsub("_", "^7_^4")
+    if ok and type(cfg) == "table" then
+        local weight = cfg.maxWeight or (cfg.player and cfg.player.maxWeight) or (cfg.inventory and cfg.inventory.maxWeight)
+        local slots = cfg.maxSlots or (cfg.player and cfg.player.slots) or (cfg.inventory and cfg.inventory.slots)
+        if weight then cache.InventoryWeight = weight end
+        if slots then cache.InventorySlots = slots end
+        invResource = Exports.OneInv:gsub("-", "^7-^4"):gsub("_", "^7_^4")
+    end
 end
 
 for script, data in pairs(invWeightTable) do
@@ -554,6 +555,7 @@ for script, data in pairs(invWeightTable) do
     end
     ::skip::
 end
+
 endTimer("InvWeight")
 endTimer("InvSlots")
 
