@@ -182,13 +182,6 @@ function toggleDuty()
                 onDuty = getPlayer().onDuty
             end
         },
-        {   framework = RSGExport,
-            func = function()
-                TriggerServerEvent("RSGCore:ToggleDuty")
-                Wait(100)
-                onDuty = getPlayer().onDuty
-            end
-        },
         {   framework = ESXExport,
             func = function()
                 local tempJob = ESX.GetPlayerData().job
@@ -226,9 +219,6 @@ RegisterNetEvent("QBCore:Client:OnJobUpdate", function(JobInfo) onDuty = JobInfo
 RegisterNetEvent("QBCore:Client:SetDuty", function(duty) onDuty = duty end)
 
 RegisterNetEvent("qbx_core:client:onJobUpdate", function(JobInfo) onDuty = JobInfo.onduty end)
-
-RegisterNetEvent("RSGCore:Client:OnJobUpdate", function(JobInfo) onDuty = JobInfo.onduty end)
-RegisterNetEvent("RSGCore:Client:SetDuty", function(duty) onDuty = duty end)
 
 -------------------------------------------------------------
 -- Interaction Functions

@@ -8,13 +8,6 @@ Exports = {
 
     OXInv = "ox_inventory",
     OneInv = "one_inventory",
-    QBInv = "qb-inventory",
-    PSInv = "ps-inventory",
-    CoreInv = "core_inventory",
-    CodeMInv = "codem-inventory",
-    OrigenInv = "origen_inventory",
-    TgiannInv = "tgiann-inventory",
-    JPRInv = "jpr-inventory",
 
     OXLibExport = "ox_lib",
 
@@ -22,21 +15,10 @@ Exports = {
 
     QBTargetExport = "qb-target",
     OXTargetExport = "ox_target",
-
-    -- REDM
-    RSGExport = "rsg-core",
-    RSGInv = "rsg-inventory",
-
-    VorpExport = "vorp_core",
-    VorpInv = "vorp_inventory",
-    VorpMenu = "vorp_menu",
-
 }
 
 -- Required variables
 debugMode = false
-
-QBInvNew = true
 
 InventoryWeight = 120000
 
@@ -230,45 +212,4 @@ for _, v in pairs({ -- This is a specific load order
 end
 
 -- Auto Detection of Old/New QBInv/PSInv versions --
-
-if isStarted(QBInv) then
-    if isServer() then
-        if not checkExportExists(QBInv, "CreateShop") then
-            print("^6Bridge^7: ^2Can^7'^2t ^2find new ^4"..QBInv.."^2 export^7, ^2forcing ^1QBInvNew ^2to ^1false^7")
-            QBInvNew = false
-        end
-    else
-        if checkExportExists(QBInv, "GetTrunkSize") then
-            print("^6Bridge^7: ^2Found old ^4"..QBInv.."^3 export^7, ^2forcing ^1QBInvNew ^2to ^1false^7")
-            QBInvNew = false
-        end
-    end
-end
-
-if isStarted(PSInv) then
-    if isServer() then
-        if not checkExportExists(PSInv, "CreateShop") then
-            print("^6Bridge^7: ^2Can^7'^2t ^2find new ^4"..PSInv.."^2 export^7, ^2forcing ^1QBInvNew ^2to ^1false^7")
-            QBInvNew = false
-        end
-    else
-        local function versionCompare(v1, v2)
-            local split = function(v) local t = {} for s in v:gmatch("[^.]+") do t[#t+1] = tonumber(s) end return t end
-            local a, b = split(v1), split(v2)
-            for i = 1, math.max(#a, #b) do
-                local ai, bi = a[i] or 0, b[i] or 0
-                if ai > bi then return true
-                elseif ai < bi then return false end
-            end
-            return true
-        end
-
-        if versionCompare(GetResourceMetadata(PSInv, "version", 0), "1.0.6") then
-            print("^6Bridge^7: ^4"..PSInv.."^2 Version above ^31.0.6^7, ^2forcing ^1QBInvNew ^2to ^1true^7")
-            QBInvNew = true
-        else
-            print("^6Bridge^7: ^4"..PSInv.."^2 Version ^1below ^31.0.6^7, ^2forcing ^1QBInvNew ^2to ^1false^7")
-            QBInvNew = false
-        end
-    end
-end
+-- QBInv and PSInv support has been removed - keeping only one_inventory and ox_inventory

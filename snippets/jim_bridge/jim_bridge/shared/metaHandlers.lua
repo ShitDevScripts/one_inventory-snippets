@@ -81,25 +81,9 @@ local metaDataFunc = {
             end,
     },
 
-    {   framework = RSGExport,
-        GetPlayer =
-            function(src)
-                if src then
-                    return exports[RSGExport]:GetCoreObject().Functions.GetPlayer(src)
-                end
-                local info = nil
-                Core.Functions.GetPlayerData(function(PlayerData) info = PlayerData end)
-                return info
-            end,
-        GetPlayerMetadata = function(Player, dataToCheck)
-            return Player.PlayerData.metadata[dataToCheck]
-        end,
-        SetPlayerMetadata = function(Player, key, value)
-            return Player.Functions.SetMetaData(key, value)
-        end,
-    },
-
 }
+
+
 
 
 -------------------------------------------------------------

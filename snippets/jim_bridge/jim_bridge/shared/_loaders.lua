@@ -114,43 +114,6 @@ local frameworkLoadFunc = {
             end,
     },
 
-    {   framework = Exports.RSGExport,
-        onPlayerLoaded =
-            function(func)
-                RegisterNetEvent('RSGCore:Client:OnPlayerLoaded', func)
-            end,
-        onPlayerUnload =
-            function(func)
-                RegisterNetEvent('RSGCore:Client:OnPlayerUnload', func)
-            end,
-        waitforLogin =
-            function(timeout)
-                local startTime = GetGameTimer()
-                while not LocalPlayer.state.isLoggedIn and (GetGameTimer() - startTime) < timeout do
-                    Wait(100)
-                end
-                return LocalPlayer.state.isLoggedIn
-            end,
-    },
-
-    {   framework = Exports.VorpExport,
-        onPlayerLoaded =
-            function(func)
-                RegisterNetEvent('vorp_core:Client:OnPlayerSpawned', func)
-            end,
-        onPlayerUnload =
-            function(func)
-                --??
-            end,
-        waitforLogin =
-            function(timeout)
-                local startTime = GetGameTimer()
-                while not LocalPlayer.state.IsInSession and (GetGameTimer() - startTime) < timeout do
-                    Wait(100)
-                end
-                return LocalPlayer.state.IsInSession
-            end,
-    },
 }
 
 -------------------------------------------------------------
@@ -286,6 +249,47 @@ function waitForLogin()
     end
 end
 
+--- Waits for the active inventory system to be fully initialized and ready.
+--- Uses pcall to safely probe a known export until it succeeds (or timeout).
+--- @return boolean True if the inventory system is ready, false on timeout.
+function waitForInventoryReady()
+    local timeout = GetGameTimer() + 60000 -- 60 seconds max wait
+
+    if isStarted(OneInv) then
+        debugPrint("^6Bridge^7: ^2Waiting for ^3"..OneInv.."^2 to be ready...")
+        while GetGameTimer() < timeout do
+            local ok = pcall(function()
+                return exports[OneInv]:GetItemCount("test")
+            end)
+            if ok then
+                debugPrint("^6Bridge^7: ^3"..OneInv.."^2 is ready.")
+                return true
+            end
+            Wait(100)
+        end
+        print("^4Error^7: ^2Timeout reached while waiting for ^3"..OneInv.."^2 to be ready.")
+        return false
+
+    elseif isStarted(OXInv) then
+        debugPrint("^6Bridge^7: ^2Waiting for ^3"..OXInv.."^2 to be ready...")
+        while GetGameTimer() < timeout do
+            local ok = pcall(function()
+                return exports[OXInv]:CanCarryItem("test", 1)
+            end)
+            if ok then
+                debugPrint("^6Bridge^7: ^3"..OXInv.."^2 is ready.")
+                return true
+            end
+            Wait(100)
+        end
+        print("^4Error^7: ^2Timeout reached while waiting for ^3"..OXInv.."^2 to be ready.")
+        return false
+    end
+
+    -- No inventory system detected, nothing to wait for
+    return true
+end
+
 local messageShown = false
 function waitForSharedLoad()
     local timeout = GetGameTimer() + 900000 -- 15 minutes max wait (had to up this from 2 minutes because of slow servers)
@@ -313,6 +317,8 @@ function waitForSharedLoad()
     end
 
     if Jobs and Items and Vehicles then
+        -- Now wait for the inventory system to be fully initialized
+        waitForInventoryReady()
         debugPrint("^6Bridge^7: ^2Jobs, Items, and Vehicles Loaded^7.")
         return true
     else

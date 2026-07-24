@@ -50,16 +50,6 @@ function registerCommand(command, options)
             optionTable.restriction or nil
         )
 
-    elseif isStarted(RSGExport) then
-        commandResource = RSGExport
-        Core.Commands.Add(command,
-            optionTable.helpInfo,
-            optionTable.subText,
-            optionTable.argsRequired,
-            optionTable.funct,
-            optionTable.restriction or nil
-        )
-
     elseif isStarted(ESXExport) then
         commandResource = ESXExport
         ESX.RegisterCommand(command,

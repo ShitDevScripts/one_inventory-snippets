@@ -10,7 +10,6 @@ if isServer() then
     local excludeRes = {
         [Exports.QBExport] = true,
         [Exports.ESXExport] = true,
-        [Exports.VorpExport] = true,
     }
 
     local AuthEvent = getScript()..":"..keyGen()..keyGen()..keyGen()..keyGen()..":"..keyGen()..keyGen()..keyGen()..keyGen()

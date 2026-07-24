@@ -1,7 +1,6 @@
 Items, Vehicles, Jobs, Gangs = nil, nil, nil, nil
 
 -- Shared Exports Initialization
-Exports.PSInv = isStarted("lj-inventory") and "lj-inventory" or Exports.PSInv
 
 OXLibExport, QBXExport, QBExport, ESXExport, OXCoreExport =
     Exports.OXLibExport or "",
@@ -10,30 +9,15 @@ OXLibExport, QBXExport, QBExport, ESXExport, OXCoreExport =
     Exports.ESXExport or "",
     Exports.OXCoreExport or ""
 
-OXInv, OneInv, QBInv, PSInv, CoreInv, CodeMInv, OrigenInv, TgiannInv, JPRInv =
+OXInv, OneInv =
     Exports.OXInv or "",
-    Exports.OneInv or "",
-    Exports.QBInv or "",
-    Exports.PSInv or "",
-    Exports.CoreInv or "",
-    Exports.CodeMInv or "",
-    Exports.OrigenInv or "",
-    Exports.TgiannInv or "",
-    Exports.JPRInv or ""
-
-RSGExport, RSGInv = Exports.RSGExport or "", Exports.RSGInv or ""
-VorpExport, VorpInv = Exports.VorpExport or "", Exports.VorpInv or ""
-
+    Exports.OneInv or ""
 
 QBMenuExport = Exports.QBMenuExport or ""
 QBTargetExport, OXTargetExport = Exports.QBTargetExport or "", Exports.OXTargetExport or ""
 
 if isStarted(QBXExport) or isStarted(QBExport) then
     Core = Core or exports[QBExport]:GetCoreObject()
-elseif isStarted(RSGExport) then
-    Core = Core or exports[RSGExport]:GetCoreObject()
-elseif isStarted(VorpExport) then
-    Core = Core or exports[VorpExport]:GetCore()
 end
 
 
@@ -79,6 +63,9 @@ else
         InventorySlots = cache.InventorySlots or 50
 
         CreateThread(function()
+            -- Wait for the active inventory system to be fully initialized before processing items
+            waitForInventoryReady()
+
             if isStarted(ESXExport) then
                 for _, v in pairs(Vehicles) do
                     Vehicles[v.model] = {
@@ -99,6 +86,15 @@ else
                         Items[k].image = (tempInfo.client.image) and tempInfo.client.image:gsub("nui://"..OXInv.."/web/images/", "") or Items[k].image
                         Items[k].hunger = tempInfo.client.hunger
                         Items[k].thirst = tempInfo.client.thirst
+                    end
+                end
+            end
+
+            -- Ensure OneInv item image fallback is set
+            if isStarted(OneInv) then
+                for k, v in pairs(Items) do
+                    if not Items[k].image then
+                        Items[k].image = k..".png"
                     end
                 end
             end

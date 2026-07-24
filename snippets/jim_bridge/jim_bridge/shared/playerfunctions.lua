@@ -66,33 +66,6 @@ local hungerThirstFunc = {
             end,
     },
 
-    {   framework = RSGExport,
-        setThirst =
-            function(src, thirst)
-                local Player = Core.Functions.GetPlayer(src)
-                local newThirst = Player.PlayerData.metadata.thirst + thirst
-                newThirst = (newThirst >= 100.0 and 100.0) or (newThirst <= 0 and 0) or newThirst
-                Player.Functions.SetMetaData('thirst', newThirst)
-                TriggerClientEvent("hud:client:UpdateNeeds", src, Player.PlayerData.metadata.hunger, newThirst)
-            end,
-        setHunger =
-            function(src, hunger)
-                local Player = Core.Functions.GetPlayer(src)
-                local newHunger = Player.PlayerData.metadata.hunger + hunger
-                newHunger = (newHunger >= 100.0 and 100.0) or (newHunger <= 0 and 0) or newHunger
-                Player.Functions.SetMetaData('hunger', newHunger)
-                TriggerClientEvent("hud:client:UpdateNeeds", src, newHunger, Player.PlayerData.metadata.thirst)
-            end,
-        setStress =
-            function(src, stress)
-                local Player = Core.Functions.GetPlayer(src)
-                local newStress = Player.PlayerData.metadata.stress - stress
-                newStress = (newStress >= 100.0 and 100.0) or (newStress <= 0 and 0) or newStress
-                Player.Functions.SetMetaData('stress', newStress)
-                TriggerClientEvent('hud:client:UpdateStress', src, newStress)
-            end,
-    },
-
     {   framework = ESXExport,
         setThirst =
             function(src, thirst)
@@ -262,17 +235,6 @@ local moneyFunc = {
     },
 
     {   framework = QBExport,
-        chargePlayer =
-            function(src, amount, moneyType)
-                return Core.Functions.GetPlayer(src).Functions.RemoveMoney(moneyType or "cash", amount)
-            end,
-        fundPlayer =
-            function(src, amount, moneyType)
-                return Core.Functions.GetPlayer(src).Functions.AddMoney(moneyType or "cash", amount)
-            end,
-    },
-
-    {   framework = RSGExport,
         chargePlayer =
             function(src, amount, moneyType)
                 return Core.Functions.GetPlayer(src).Functions.RemoveMoney(moneyType or "cash", amount)
@@ -501,37 +463,9 @@ local hasGroupFunc = {
             end,
     },
 
-    {   framework = RSGExport,
-        hasGroup =
-            function(group, grade, src)
-                local hasJobFlag, duty = false, true
-                local playerInfo = GetPlayer(src)
-                local jobInfo, gangInfo = nil, nil
-                if next(playerInfo) then
-                    jobInfo = playerInfo.job
-                    gangInfo = playerInfo.gang
-                    if playerInfo.PlayerData then
-                        jobInfo = playerInfo.PlayerData.job
-                        gangInfo = playerInfo.PlayerData.gang
-                    end
-                end
-                if jobInfo and jobInfo.name == group then
-                    hasJobFlag = true
-                    duty = jobInfo.onduty
-                    if grade and not (grade <= jobInfo.grade.level) then
-                        hasJobFlag = false
-                    end
-                end
-                if gangInfo and gangInfo.name == group then
-                    hasJobFlag = true
-                    if grade and not (grade <= gangInfo.grade.level) then
-                        hasJobFlag = false
-                    end
-                end
-                return hasJobFlag, duty
-            end,
-    },
 }
+
+
 
 
 --- Checks if a player has a specific job or gang (and optionally meets a minimum grade).
@@ -817,72 +751,9 @@ local getPlayerFunc = {
             end,
     },
 
-    {   framework = RSGExport,
-        serverSide =
-            function(src)
-                local Player = {}
-                if Core.Functions.GetPlayer(src) then
-                    local info = Core.Functions.GetPlayer(src).PlayerData
-                    if not info then return {} end
-                    Player = {
-                        firstname = info.charinfo.firstname,
-                        lastname = info.charinfo.lastname,
-                        name = info.charinfo.firstname.." "..info.charinfo.lastname,
-                        cash = info.money["cash"],
-                        bank = info.money["bank"],
-                        source = info.source,
-                        job = info.job.name,
-                        jobBoss = info.job.isboss,
-                        jobInfo = info.job,
-                        gang = info.gang.name,
-                        gangBoss = info.gang.isboss,
-                        gangInfo = info.gang,
-                        onDuty = info.job.onduty,
-                        account = info.charinfo.account,
-                        citizenId = info.citizenid,
-                        isDead = info.metadata["isdead"],
-                        isDown = info.metadata["inlaststand"],
-                        charInfo = info.charinfo,
-                        hunger = info.metadata["hunger"],
-                        thirst = info.metadata["thirst"],
-                    }
-                end
-                return Player
-            end,
-
-        clientSide =
-            function()
-                local Player = {}
-                local info = nil
-                Core.Functions.GetPlayerData(function(PlayerData) info = PlayerData end)
-                if not info.charinfo then return {} end
-
-                Player = {
-                    firstname = info.charinfo.firstname,
-                    lastname = info.charinfo.lastname,
-                    name = info.charinfo.firstname.." "..info.charinfo.lastname,
-                    cash = info.money["cash"],
-                    bank = info.money["bank"],
-                    source = info.source,
-                    job = info.job.name,
-                    jobBoss = info.job.isboss,
-                    jobInfo = info.job,
-                    gang = info.gang.name,
-                    gangBoss = info.gang.isboss,
-                    gangInfo = info.gang,
-                    onDuty = info.job.onduty,
-                    account = info.charinfo.account,
-                    citizenId = info.citizenid,
-                    isDead = info.metadata["isdead"],
-                    isDown = info.metadata["inlaststand"],
-                    charInfo = info.charinfo,
-                    hunger = info.metadata["hunger"],
-                    thirst = info.metadata["thirst"],
-                }
-                return Player
-            end,
-    },
 }
+
+
 
 --- Retrieves basic player information (name, cash, bank, job, etc.) based on the active core/inventory system.
 ---

@@ -10,3 +10,8 @@ Save your changes and restart the resource.
 jim_bridge will now use one_inventory as its inventory system.
 
 script by jim: https://jimathy666.tebex.io/
+
+
+
+
+DISCLAIMER: THIS BRIDGE IS ONLY FOR OX_INVENTORY AND ONE_INVENTORY

@@ -64,10 +64,6 @@ function createCallback(callbackName, funct)
                 debugPrint("^6Bridge^7: ^2Registering ^4"..QBExport.." ^3Callback^7:", callbackName)
                 Core = Core or exports[QBExport]:GetCoreObject()
                 Core.Functions.CreateCallback(callbackName, adaptedFunction)
-            elseif isStarted(VorpExport) then
-                debugPrint("^6Bridge^7: ^2Registering ^4"..VorpExport.." ^3Callback^7:", callbackName)
-                Core = Core or exports.vorp_core:GetCore()
-                Core.Callback.Register(callbackName, adaptedFunction)
             elseif isStarted(ESXExport) then
                 debugPrint("^6Bridge^7: ^2Registering ^4"..ESXExport.." ^3Callback^7:", callbackName)
                 ESX.RegisterServerCallback(callbackName, adaptedFunction)
@@ -121,14 +117,6 @@ function triggerCallback(callbackName, ...)
             if res ~= nil then return res, "nil" end
             lastErr = err
             debugPrint(("^6Bridge^7: ^3Callback^7 %s ^1failed^7 (QB) attempt %d: %s"):format(callbackName, attempts, tostring(err)))
-
-        elseif isStarted(VorpExport) then
-            local res, err = awaitWithTimeout(function(cb)
-                Core.Callback.TriggerAwait(callbackName, cb, table.unpack(args))
-            end, 5000)
-            if res ~= nil then return res, "nil" end
-            lastErr = err
-            debugPrint(("^6Bridge^7: ^3Callback^7 %s ^1failed^7 (Vorp) attempt %d: %s"):format(callbackName, attempts, tostring(err)))
 
         elseif isStarted(ESXExport) then
             local res, err = awaitWithTimeout(function(cb)

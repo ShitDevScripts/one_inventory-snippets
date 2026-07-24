@@ -3,8 +3,7 @@ author "Jimathy"
 version "2.1.09"
 description "Framework Bridge By Jimathy"
 fx_version "cerulean"
-rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
-games { 'gta5', 'rdr3' }
+games { 'gta5' }
 lua54 'yes'
 
 files {
