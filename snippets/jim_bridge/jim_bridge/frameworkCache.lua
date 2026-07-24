@@ -14,13 +14,6 @@ local Exports = {
 
     OXInv = "ox_inventory",
     OneInv = "one_inventory",
-    QBInv = "qb-inventory",
-    PSInv = "ps-inventory",
-    CoreInv = "core_inventory",
-    CodeMInv = "codem-inventory",
-    OrigenInv = "origen_inventory",
-    TgiannInv = "tgiann-inventory",
-    JPRInv = "jpr-inventory",
 
     OXLibExport = "ox_lib",
 
@@ -28,14 +21,6 @@ local Exports = {
 
     QBTargetExport = "qb-target",
     OXTargetExport = "ox_target",
-
-    -- REDM
-    RSGExport = "rsg-core",
-    RSGInv = "rsg-inventory",
-
-    VorpExport = "vorp_core",
-    VorpInv = "vorp_inventory",
-    VorpMenu = "vorp_menu",
 }
 
 -- Prevent reloading if cache is already initialized
@@ -152,16 +137,6 @@ local itemFunc = {
         cacheItem = function()
             local success, result = pcall(function()
                 return exports[Exports.OXInv]:Items()
-            end)
-            if success and result then
-                cache.Items = result
-            end
-        end,
-    },
-    {   script = Exports.TgiannInv,
-        cacheItem = function()
-            local success, result = pcall(function()
-                return exports[Exports.TgiannInv]:Items()
             end)
             if success and result then
                 cache.Items = result
@@ -482,17 +457,6 @@ local invWeightTable = {
         weight = { key = "one_inventory:maxWeight", default = 30000 },
         slots  = { key = "one_inventory:maxSlots",  default = 40 }
     }},
-    [Exports.QBInv] = {
-        fallback = {
-            { file = "config.lua",              path = { "MaxInventoryWeight" }, slotPath = { "MaxInventorySlots" } }, -- old version
-            { file = "config/config.lua",       path = { "MaxWeight" },       slotPath = { "MaxSlots" } },       -- new version
-        }
-    },
-    [Exports.JPRInv] =      { file = "configs/main_config.lua", path = { "MaxInventoryWeight" }, slotPath = { "MaxInventorySlots" } },
-    [Exports.PSInv] =       { file = "config.lua",              path = { "MaxInventoryWeight" }, slotPath = { "MaxInventorySlots" } },
-    [Exports.TgiannInv] =   { file = "configs/config.lua",      path = { "slotsMaxWeights", "player", "maxWeight" }, slotPath = { "slotsMaxWeights", "player", "slots" } },
-    [Exports.CodeMInv] =    { file = "config/config.lua",       path = { "MaxWeight" }, slotPath = { "MaxSlots" } },
-    [Exports.RSGInv] =      { file = "config/config.lua",       path = { "MaxWeight" }, slotPath = { "MaxSlots" } },
 }
 
 -- Run config detection
